@@ -1,12 +1,9 @@
-<script>
-    import {
-        FSPhotoViewer,
-        Thumbnail,
-        Photos,
-        pannable,
-    } from "../src/index.js";
+<script lang="ts">
+    import FSPhotoViewer from "$lib/FSPhotoViewer.svelte";
+    import Thumbnail from "$lib/Thumbnail.svelte";
+    import "../app.css";
 
-    let unsplash = [
+    const unsplash = [
         {
             id: "8YdGi6rC6Z0",
             w: 2400,
@@ -39,11 +36,11 @@
         },
     ];
 
-    let photos = unsplash.map(x => ({
+    const photos = unsplash.map((x) => ({
         src: `https://source.unsplash.com/${x.id}/${x.w}x${x.h}`,
         thumbnail: `https://source.unsplash.com/${x.id}/${x.w / 5}x${x.h / 5}`,
         key: x.id,
-        ratio: x.w/x.h,
+        ratio: x.w / x.h,
     }));
 </script>
 
@@ -56,7 +53,7 @@
             </Thumbnail>
         </li>
     {/each}
-    <li/>
+    <li />
 </ul>
 
 <style>
@@ -73,7 +70,7 @@
         display: flex;
         flex-wrap: wrap;
         list-style: none;
-        padding:0;
+        padding: 0;
     }
 
     li {

@@ -1,23 +1,26 @@
-<script>
-    import { onMount } from "svelte";
+<svelte:options customElement="fs-thumbnail" />
+
+<script lang="ts">
     import { send, receive } from "./crossfade.js";
-    import {
-        currentPhoto,
-        currentPhotoStatus,
-        _currentIndex,
-    } from "./store.js";
-    export let key;
-    export let addPlaceholder = false;
+    import { currentPhoto, currentPhotoStatus, _currentIndex } from "./store.js";
+    export let key: string;
+    export let addPlaceholder: boolean = false;
 
     let isCurrent = false;
 
-    let containerEl;
+    let containerEl: HTMLDivElement;
 
     function handleClick() {
         _currentIndex.setKey(key);
     }
 
-    currentPhoto.subscribe(v => {
+    function handleKeydown(e: KeyboardEvent) {
+        if (e.key === "Enter") {
+            _currentIndex.setKey(key);
+        }
+    }
+
+    currentPhoto.subscribe((v) => {
         if (!v) {
             isCurrent = false;
             return;
@@ -37,14 +40,16 @@
     });
 </script>
 
-<svelte:options tag="fs-thumbnail" />
 <div class="container" bind:this={containerEl}>
     {#if !isCurrent || (isCurrent && !$currentPhotoStatus.loaded)}
         <div
             class="thumbnail"
+            role="button"
+            tabindex="0"
             in:receive={{ key: key }}
             out:send={{ key: key }}
             on:click={handleClick}
+            on:keydown={handleKeydown}
         >
             <slot />
             {#if isCurrent && $currentPhotoStatus.loading}
@@ -52,10 +57,8 @@
                     <span class="loader" />
                 </div>
             {/if}
-
         </div>
     {:else if addPlaceholder}
-
         <div class="thumbnail" style="width:{containerEl.clientWidth}px"></div>
     {/if}
 </div>

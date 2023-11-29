@@ -1,8 +1,8 @@
-export function pannable(node) {
+export function pannable(node: HTMLElement): { destroy: () => void } {
     let scale = 1;
     let panX = 0;
     let panY = 0;
-    let zoomTimeout = null;
+    let zoomTimeout: ReturnType<typeof setTimeout> | null = null;
 
     let touchData = {
         t: [],
@@ -19,12 +19,14 @@ export function pannable(node) {
 
         node.style.cursor = "all-scroll";
 
-        node.dispatchEvent(new CustomEvent('panstart', {
-            detail: {x, y}
-        }));
+        node.dispatchEvent(
+            new CustomEvent("panstart", {
+                detail: { x, y },
+            }),
+        );
 
-        window.addEventListener('mousemove', handleMousemove);
-        window.addEventListener('mouseup', handleMouseup);
+        window.addEventListener("mousemove", handleMousemove);
+        window.addEventListener("mouseup", handleMouseup);
     }
 
     function handleWheel(e) {
@@ -33,35 +35,42 @@ export function pannable(node) {
         let delta = e.deltaY < 0 ? unit : -unit;
         scale = Math.min(Math.max(0.95, scale + delta), 4);
 
-        if (zoomTimeout) clearTimeout(zoomTimeout)
-        if (scale < 1) zoomTimeout = setTimeout(resetScale, 500)
+        if (zoomTimeout) clearTimeout(zoomTimeout);
+        if (scale < 1) zoomTimeout = setTimeout(resetScale, 500);
 
         recenter();
 
-        node.dispatchEvent(new CustomEvent('panmove', {
-            detail: {panX, panY, spring: true}
-        }));
+        node.dispatchEvent(
+            new CustomEvent("panmove", {
+                detail: { panX, panY, spring: true },
+            }),
+        );
 
-        node.dispatchEvent(new CustomEvent('zoomchanged', {
-            detail: {scale, spring: true}
-        }));
+        node.dispatchEvent(
+            new CustomEvent("zoomchanged", {
+                detail: { scale, spring: true },
+            }),
+        );
     }
 
     function resetScale() {
-        scale = 1
-        node.dispatchEvent(new CustomEvent('zoomchanged', {
-            detail: {scale, spring: true}
-        }));
+        scale = 1;
+        node.dispatchEvent(
+            new CustomEvent("zoomchanged", {
+                detail: { scale, spring: true },
+            }),
+        );
     }
 
     function handleMousemove(event) {
         panX = panX + event.movementX / scale;
         panY = panY + event.movementY / scale;
 
-        node.dispatchEvent(new CustomEvent('panmove', {
-            detail: {panX, panY, spring: false}
-        }));
-
+        node.dispatchEvent(
+            new CustomEvent("panmove", {
+                detail: { panX, panY, spring: false },
+            }),
+        );
     }
 
     function handleMouseup(event) {
@@ -71,15 +80,19 @@ export function pannable(node) {
         node.style.cursor = "unset";
         recenter();
 
-        node.dispatchEvent(new CustomEvent('panend', {
-            detail: {x, y}
-        }));
-        node.dispatchEvent(new CustomEvent('panmove', {
-            detail: {panX, panY, spring: true}
-        }));
+        node.dispatchEvent(
+            new CustomEvent("panend", {
+                detail: { x, y },
+            }),
+        );
+        node.dispatchEvent(
+            new CustomEvent("panmove", {
+                detail: { panX, panY, spring: true },
+            }),
+        );
 
-        window.removeEventListener('mousemove', handleMousemove);
-        window.removeEventListener('mouseup', handleMouseup);
+        window.removeEventListener("mousemove", handleMousemove);
+        window.removeEventListener("mouseup", handleMouseup);
     }
 
     function recenter() {
@@ -92,7 +105,7 @@ export function pannable(node) {
         if (wdiff > 0) {
             if (Math.abs(panX * scale) > wdiff / 2) {
                 const sign = panX > 0 ? 1 : -1;
-                panX = wdiff / 2 / scale * sign;
+                panX = (wdiff / 2 / scale) * sign;
             }
         } else {
             panX = 0;
@@ -100,18 +113,18 @@ export function pannable(node) {
         if (hdiff > 0) {
             if (Math.abs(panY * scale) > hdiff / 2) {
                 const sign = panY > 0 ? 1 : -1;
-                panY = hdiff / 2 / scale * sign;
+                panY = (hdiff / 2 / scale) * sign;
             }
         } else {
             panY = 0;
         }
 
-        node.dispatchEvent(new CustomEvent('panmove', {
-            detail: {panX, panY, spring: true}
-        }));
+        node.dispatchEvent(
+            new CustomEvent("panmove", {
+                detail: { panX, panY, spring: true },
+            }),
+        );
     }
-
-
 
     function handleTouchstart(e) {
         if (e.touches.length == 2) {
@@ -128,7 +141,6 @@ export function pannable(node) {
     };
 
     function handleTouchmove(e) {
-
         e.preventDefault();
         if (e.touches.length == 1 && e.changedTouches.length == 1) {
             if (!touchData.lastE) touchData.lastE = e.changedTouches[0];
@@ -140,17 +152,19 @@ export function pannable(node) {
             panX += diffX / scale;
             panY += diffY / scale;
 
-            node.dispatchEvent(new CustomEvent('panmove', {
-                detail: {panX, panY, spring: false}
-            }));
+            node.dispatchEvent(
+                new CustomEvent("panmove", {
+                    detail: { panX, panY, spring: false },
+                }),
+            );
 
             touchData.lastE = e.changedTouches[0];
-
         }
         if (e.touches.length == 2 && e.changedTouches.length == 2) {
             // Check if the two target touches are the same ones that started
             // the 2-touch
-            let point1 = -1, point2 = -1;
+            let point1 = -1,
+                point2 = -1;
             for (let i = 0; i < touchData.t.length; i++) {
                 if (touchData.t[i].identifier == e.touches[0].identifier) point1 = i;
                 if (touchData.t[i].identifier == e.touches[1].identifier) point2 = i;
@@ -167,45 +181,41 @@ export function pannable(node) {
                 touchData.pinchDist = dist2;
 
                 scale = Math.min(Math.max(1, scale - diff / 100), 4);
-                node.dispatchEvent(new CustomEvent('zoomchanged', {
-                    detail: {scale, spring: false}
-                }));
-            }
-            else {
+                node.dispatchEvent(
+                    new CustomEvent("zoomchanged", {
+                        detail: { scale, spring: false },
+                    }),
+                );
+            } else {
                 // console.log("else")
                 touchData.t = [];
                 touchData.pinchDist = 0;
             }
         }
-
-
-
     }
 
     function handleTouchend(e) {
-
         touchData.pinchDist = 0;
         touchData.lastE = null;
         // console.log("touch ended")
 
         if (scale < 1.02) resetScale();
         recenter();
-
     }
 
-    node.addEventListener('mousedown', handleMousedown);
-    window.addEventListener('wheel', handleWheel, {passive: false});
-    node.addEventListener('touchstart', handleTouchstart, {passive: true});
-    node.addEventListener('touchmove', handleTouchmove, {passive: true});
-    node.addEventListener('touchend', handleTouchend, {passive: true});
+    node.addEventListener("mousedown", handleMousedown);
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    node.addEventListener("touchstart", handleTouchstart, { passive: true });
+    node.addEventListener("touchmove", handleTouchmove, { passive: true });
+    node.addEventListener("touchend", handleTouchend, { passive: true });
 
     return {
         destroy() {
-            node.removeEventListener('mousedown', handleMousedown);
-            window.removeEventListener('wheel', handleWheel);
-            node.removeEventListener('touchstart', handleTouchstart);
-            node.removeEventListener('touchmove', handleTouchmove);
-            node.removeEventListener('touchend', handleTouchend);
-        }
+            node.removeEventListener("mousedown", handleMousedown);
+            window.removeEventListener("wheel", handleWheel);
+            node.removeEventListener("touchstart", handleTouchstart);
+            node.removeEventListener("touchmove", handleTouchmove);
+            node.removeEventListener("touchend", handleTouchend);
+        },
     };
 }
