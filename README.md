@@ -2,7 +2,7 @@
 
 Create a Google Photos-esque image gallery.
 This can be used with Vanilla JS, as well as within a Svelte project.
-This is an updated fork of https://github.com/psnszsn/svelte-photoviewer converted to Typescript.
+This is an updated fork of https://github.com/psnszsn/svelte-photoviewer converted to Typescript and svelte 4 using Sveltekit to build the library instead of rollup.
 
 ## Demo
 
