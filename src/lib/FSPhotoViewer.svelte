@@ -12,7 +12,7 @@
         prevPhoto,
     } from "./store.js";
     import { receive, send } from "./crossfade.js";
-    import {get} from "svelte/store";
+    import { get } from "svelte/store";
 
     export let photos: Photo[];
 
@@ -121,7 +121,6 @@
 <svelte:window on:keydown={handleKeydown} />
 
 {#if $currentPhotoStatus.loaded}
-
     {#await $currentPhoto}
         <slot name="placeholder" />
     {:then d}
