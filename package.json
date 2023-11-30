@@ -1,6 +1,6 @@
 {
     "name": "@meticoeus/svelte-photoviewer",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "svelte": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "type": "module",

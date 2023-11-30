@@ -8,8 +8,7 @@ const next: Move = (x, max) => (x + 1 > max ? 0 : x + 1);
 
 export interface Photo {
     src: string;
-    width: number;
-    height: number;
+    thumbnail: string;
     key: string;
 }
 
